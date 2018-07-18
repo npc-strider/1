@@ -1,0 +1,75 @@
+
+--Acidic fluids
+acidic =
+	{
+		"sulfuric-acid"
+	}
+
+--Whitelisted pipes
+resistant_pipes = 
+	{
+	
+	}
+
+
+require "util"
+
+--How frequently events should be executed. Will effect gameplay
+
+local interval = 5
+
+function contains_item(item, table)
+	for k, item in ipairs(table) do
+		if item == table then
+			return true
+		else
+			return false
+		end
+	end
+end
+
+function build_acid_pipe(event)
+	local entity = event.entity
+	if entity and entity.valid and entity.name == "acid-pipe" then
+		if global.acid_pipes == nil then
+			global.acid_pipes = {}
+		end
+		global.acid_pipes[#global.acid_pipes+1] = entity
+	end
+end
+
+
+--[[function remove_acid_pipe(event)
+	if event.entity.name == "acid-pipe" then
+		if global.acid_pipes == nil then
+			global.acid_pipes = {}
+		end
+		global.acid_pipes[#global.acid_pipes+1] = event.entity
+	end
+end]]
+
+
+function check_acid()
+	for k, acid_pipes in ipairs(global.acid_pipes) do
+		if global.acid_pipes[k].entity.valid then
+			local entity = acid_pipes[k]
+			local fluid = entity.fluidbox[1]
+			if contains_item(entity.name, resistant_pipes) == true then
+				if contains_item(fluid.name, acidic) == true then
+					
+				end
+			end	
+		else
+			global.acid_pipes[k] = nil
+		end
+	end
+end
+
+--events
+script.on_nth_tick(interval, check_acid)
+
+script.on_event(defines.events.on_built_entity, build_acid_pipe)
+script.on_event(defines.events.on_robot_built_entity, build_acid_pipe)
+
+--script.on_event(defines.events.on_player_mined_entity, remove_acid_pipe)
+--script.on_event(defines.events.on_robot_mined_entity, remove_acid_pipe)
